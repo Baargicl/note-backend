@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  note-db:
+    image: postgres:latest
+    volumes:
+      - note-db:/data/postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: note
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+
+
+volumes:
+  note-db:
+    external: false

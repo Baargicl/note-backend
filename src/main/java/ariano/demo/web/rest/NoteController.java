@@ -7,6 +7,8 @@ import ariano.demo.service.NoteService;
 import ariano.demo.service.dto.NoteDTO;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,27 +34,32 @@ public class NoteController {
 
     }
 
+
+    @DeleteMapping
+    public String deleteAllNotes() {
+        return noteService.deleteAllNotes();
+
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<NoteDTO> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(noteService.getById(id));
 
-        }
-
-        catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
 
     }
 
     @DeleteMapping("{id}")
-    public String deleteNotes(@PathVariable Long id){
+    public String deleteNotes(@PathVariable Long id) {
 
-       String message = noteService.deleteNote(id);
-
-        return message;
+        return noteService.deleteNote(id);
 
     }
+
+
 
     @PostMapping
     public NoteDTO saveNote(@RequestBody NoteDTO noteDTO) {
@@ -61,11 +68,19 @@ public class NoteController {
 
     }
 
-    @PutMapping("{id}")
-    public NoteDTO updateNote(@RequestBody NoteDTO noteDTO, @PathVariable Long id) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateNotes(@RequestBody NoteDTO noteDTO, @PathVariable Long id) throws BadRequestException {
 
 
-        return noteService.updateNote(id, noteDTO);
+        try {
+            return ResponseEntity.ok(noteService.editNote(id, noteDTO));
+
+        } catch (EntityNotFoundException | BadRequestException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
 }
+
+

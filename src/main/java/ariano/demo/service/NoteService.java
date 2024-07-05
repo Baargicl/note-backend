@@ -7,8 +7,8 @@ import ariano.demo.service.dto.NoteDTO;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,14 +53,25 @@ public class NoteService {
         return "deleted successfully";
     }
 
-    public NoteDTO updateNote(Long id, NoteDTO noteDTO) {
+
+    public String deleteAllNotes() {
+
+        noteRepository.deleteAll();
+        return "Deleted all successfully";
+
+    }
+
+
+
+
+    public NoteDTO editNote(Long id, NoteDTO noteDTO) throws BadRequestException {
 
         if (id != noteDTO.getId()) {
-            throw new EntityNotFoundException("Note with " + id + " does not exist!");
+            throw new BadRequestException("The note can only be changed, if the note with the id has the same id like in your update you want to do.");
         }
 
         if (!noteRepository.existsById(id)) {
-            throw new EntityNotFoundException("Note with " + id + " does not exist!");
+            throw new EntityNotFoundException("Note with id " + id + " does not exist!");
         }
         Note model = noteMapper.toModel(noteDTO);
         Note saved = noteRepository.save(model);
